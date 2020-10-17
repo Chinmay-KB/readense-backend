@@ -25,31 +25,36 @@ app.get('/fetch', function(req, res) {
             return res.text();
         }
     ).then(function(html) {
-        var doc = new JSDOM(sanitizeHtml(html, {
-            allowedAttributes: {
-                a: ['href', 'name', 'target'],
-                // We don't currently allow img itself by default, but this
-                // would make sense if we did. You could add srcset here,
-                // and if you do the URL is checked for safety
-                img: ['src']
-            },
-            allowedTags: [
-                "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
-                "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
-                "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
-                "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
-                "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
-                "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
-                "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr"
-            ],
-            selfClosing: ['img', 'br', 'hr', 'area', 'base', 'basefont', 'input', 'link', 'meta'],
+        var doc = new JSDOM(sanitizeHtml(html
+            //      {
+            //     allowedAttributes: {
+            //         a: ['href', 'name', 'target'],
+            //         img: ['src']
+            //     },
+            //     allowedTags: [
+            //         "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
+            //         "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
+            //         "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
+            //         "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
+            //         "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+            //         "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+            //         "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "img"
+            //     ],
+            //     selfClosing: ['img', 'br', 'hr', 'area', 'base', 'basefont', 'input', 'link', 'meta'],
 
-        }), { url: url });
+            // }
+        ), { url: url });
         let reader = new Readability(doc.window.document);
         let article = reader.parse();
         //console.log();
-        return article.content;
-    }).then((toSend) => res.send(toSend));
+        fs.writeFile('response.json', article, (err) => console.log("e"));
+        return article;
+    }).then((article) => res.json({
+        content: article.content,
+        headline: article.headline,
+        tags: article.tags,
+        image: article.image
+    }));
 });
 
 app.listen(port, () => {
