@@ -11,6 +11,7 @@
         "jsdom": "^16.4.0",
         "multer": "^1.4.2",
         "node-fetch": "^2.6.1",
+        "node-readability": "^3.0.0",
         "sanitize-html": "^2.1.0"
     },
     "devDependencies": {},
