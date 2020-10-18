@@ -1,12 +1,8 @@
-var JSDOM = require('jsdom').JSDOM;
-var { Readability } = require('@mozilla/readability');
-const fetch = require('node-fetch');
-const sanitizeHtml = require('sanitize-html');
-const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const cors = require('cors');
+const validUrl = require('valid-url');
 var read = require('node-readability');
 
 const app = express();
@@ -20,32 +16,19 @@ app.get('/', function(req, res) {
 })
 app.get('/fetch', function(req, res) {
     var url = req.query.url;
-    var str = "Hello there!";
 
-    fetch(url, {
-        mode: 'no-cors',
-        method: 'get'
-    }).then(
-        function(res) {
-            return res.text();
-        }
-    ).then(function(html) {
-        read(html, function(err, article, meta) {
+    if (validUrl.isUri(url)) {
+        read(url, function(err, article, meta) {
             res.json({
-                content: article.content,
+                content: "<p><h1>" + article.title + "</h1></p>" + article.content,
                 title: article.title,
             });
-
-
+            // res.send("<p><h1>" + article.title + "</h1></p>" + article.content);
         });
-        //return article;
+    } else res.json({
+        content: "<p><strong> Invalid URL, please recheck the link you have provided</strong></p>",
+        title: "Error",
     });
-    // .then((article) => res.json({
-    //     content: article.content,
-    //     headline: article.headline,
-    //     tags: article.tags,
-    //     image: article.image
-    // }));
 
 });
 
